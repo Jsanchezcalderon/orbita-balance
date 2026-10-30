@@ -1,0 +1,318 @@
+{
+  "info": {
+    "_postman_id": "744c9ac8-96b4-410f-840e-1e6d9008dfc6",
+    "name": "Orbita balance",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31190706"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {\r\n  const { access_token } = pm.response.json();\r\n  pm.collectionVariables.set('token',  `Bearer ${access_token}`);\r\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"ana@orbita.test\",\r\n    \"password\": \"Ana12345!\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Saldo actual",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}"
+          },
+          {
+            "key": "",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/balances/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "balances",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Depositar saldo",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "   pm.request.headers.upsert({ key: 'Idempotency-Key', value: pm.variables.replaceIn('{{$guid}}') });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}"
+          },
+          {
+            "key": "",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": \"150.25\",\r\n  \"currency\": \"USD\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/balances/me/deposits",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "balances",
+            "me",
+            "deposits"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Retirar saldo",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "   pm.request.headers.upsert({ key: 'Idempotency-Key', value: pm.variables.replaceIn('{{$guid}}') });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}"
+          },
+          {
+            "key": "",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": \"150.25\",\r\n  \"currency\": \"USD\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/balances/me/withdrawals",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "balances",
+            "me",
+            "withdrawals"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Movimientos",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}"
+          },
+          {
+            "key": "",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/balances/me/transactions?page=1&limit=20",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "balances",
+            "me",
+            "transactions"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "WebHook",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "  const body = pm.request.body.raw;\r\n  const sig = CryptoJS.HmacSHA256(body, 'dev-only-webhook-secret-change-me').toString(CryptoJS.enc.Hex);\r\n  pm.request.headers.upsert({ key: 'X-Signature', value: sig });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{bearer_token_0evx}}"
+          },
+          {
+            "key": "",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"event_id\": \"evt_13\",\r\n    \"user_id\": \"u_123\",\r\n    \"amount\": \"200.00\",\r\n    \"currency\": \"USD\",\r\n    \"status\": \"rejected\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/webhooks/payment-gateway",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "webhooks",
+            "payment-gateway"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    },
+    {
+      "key": "bearer_token_0hmr",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0evx",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0tsw",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0ymy",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1czh",
+      "secret": true
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
