@@ -254,7 +254,7 @@ export const webhookSchema = {
   tags: ['Webhooks'],
   summary: 'Evento de la pasarela de pagos',
   description:
-    'Firma: HMAC-SHA256 en hexadecimal del body exacto con `WEBHOOK_SECRET`, en `X-Signature` (también se acepta `XSignature`). Eventos repetidos (`event_id`) se procesan una sola vez: `processed` (acreditado), `duplicate` (ya recibido) o `ignored` (`rejected`, no acredita).',
+    'Firma: HMAC-SHA256 en hexadecimal del body exacto con `WEBHOOK_SECRET`, en el header `X-Signature` (no se acepta `XSignature`). Eventos repetidos (`event_id`) se procesan una sola vez: `processed` (acreditado), `duplicate` (ya recibido) o `ignored` (`rejected`, no acredita).',
   security: [{ webhookSignature: [] }],
   body: {
     type: 'object',
