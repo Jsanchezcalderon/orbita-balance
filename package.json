@@ -1,0 +1,17 @@
+{
+  "name": "orbita-balance",
+  "version": "1.0.0",
+  "private": true,
+  "pnpm": { "onlyBuiltDependencies": ["esbuild"] },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,green \"pnpm --filter @orbita/api dev\" \"pnpm --filter @orbita/web dev\"",
+    "seed": "pnpm --filter @orbita/api seed",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "build": "pnpm --filter @orbita/web build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "engines": { "node": ">=20" }
+}
